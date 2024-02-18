@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Streaming</title>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 offset-lg-2">
+                <h3 class="mt-5">Live Streaming for Attendance </h3>
+                <button onclick="start()">Start</button>
+                <button onclick="stop()">Stop</button>
+                <img id="video-feed" src="{{ url_for('video_feed') }}" width="50%" style="justify-content: center;">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // recieving subject name from the teacher: 
+        subj = prompt("Enter Subject Code..");
+
+
+        function start() {
+            // Send a request to the server to start the stream
+            fetch('/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    start: true,
+                    subj
+                }),
+            });
+        }
+
+        function stop() {
+            // Send a request to the server to stop the stream
+            fetch('/stop', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    stop: true
+                }),
+            }).then(response => response.text()).then(data => {
+                // Display the list of present faces
+                alert(data);
+            });
+        }
+
+        // Handle page unload
+        window.addEventListener('unload', function () {
+            // Close the webcam by sending a beacon request to the server
+            navigator.sendBeacon('/close_webcam');
+        });
+    </script>
+</body>
+</html>
